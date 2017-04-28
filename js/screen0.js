@@ -1,4 +1,8 @@
 var state;
 function onScreenLoad(){
-	state = newGameState(JSON.parse(localStorage["save"]))
+	state = parent.newGameState(JSON.parse(localStorage["save"]));
+}
+
+function bugClicked(){
+	console.log("click");
 }
