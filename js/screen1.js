@@ -1,0 +1,3 @@
+function onScreenLoad(){
+	parent.removeCover();
+}

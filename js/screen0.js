@@ -1,16 +1,25 @@
+
 var state;
+var screen0 = {}
 function onScreenLoad(){
 	state = parent.newGameState(JSON.parse(localStorage["save"]));
+	console.log(state)
+	screen0.screenPanel = $('#screenPanel', window.parent.document);
 }
-function speedBetweenTwoPoints(speed, x1, y1, x2, y2){
-	dist = Math.sqrt((x1-x2)*(x1-x2) + (y1-y2)*(y1-y2))
-	return t = dist/speed
-}
+
 function bugClicked(){
-	var screenPanel = $('#screenPanel', window.parent.document);
 	var bug = $('#bugIcon');
 	bug.animate({
-        top: Math.random() * (screenPanel.height() - 100) + 50,
-        left: Math.random() * (screenPanel.width() - 100) + 50
+        top: Math.random() * (screen0.screenPanel.height() - 100) + 50,
+        left: Math.random() * (screen0.screenPanel.width() - 100) + 50
     });
+	state.bugs++;
+	checkTotals();
+}
+
+function checkTotals(){
+	console.log(state.bugs)
+	if (state.bugs >= state.screenTotals[0]){
+		parent.changeScreen(1)
+	}
 }
