@@ -1,8 +1,8 @@
 /* Global variable for this page. Used to recude namespace clutter */
 var screenState = {
 	'blinks': 0,
-	'canEnd':false,
-	"pageLoaded":false};
+	'canEnd': false,
+	"pageLoaded": false};
 
 /**
  * Called in the head before the body and hence screen has loaded. Used to set localStorage if needed
@@ -22,7 +22,7 @@ function changeScreen(to){
 		$('#screenPanel').attr("src", "screens/screen" + to + ".html");
 		$('#coverScreen').toggleClass("hide");
 		screenState.blinks = 0;
-		screenState.blinkInterval = setInterval(blink, 130);
+		screenState.blinkInterval = setInterval(blinkDiv, 130);
 	}
 }
 
@@ -30,7 +30,8 @@ function changeScreen(to){
  * Blink the coverScreen from black to white or vice versa
  * On the third blink, stay black and load the next page after at least a second.
  */
-function blink(){
+function blinkDiv(){
+	console.log("h");
 	$('#coverScreen').toggleClass("black");
 	$('#coverScreen').toggleClass("white");
 	screenState.blinks++;
@@ -69,7 +70,7 @@ class GameState {
 		} else {
 			this.bugs = 0;
 		}
-		this.screenTotals = [7];
+		this.screenTotals = [9];
 	}
 }
 /** Used to allow for a new GameState to be created from a screen. */
