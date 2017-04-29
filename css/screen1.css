@@ -1,0 +1,77 @@
+.panel {
+	position: fixed;
+}
+.bugClicker {
+	left: calc(20px + 15%);
+	top: calc(25px + 3%);
+	right: calc(51% + 10px);
+	height: 45%;
+}
+.rateInfo {
+	left: calc(20px + 15%);
+	top: calc(45px + 48%);
+	bottom: 20px;
+	right: calc(51% + 10px);
+}
+.breeders {
+	left: calc(49% + 10px);
+	bottom: calc(calc(97% - 5px) / 2);
+	transform: translate(0%,50%);
+	width: 33%;
+}
+.newsreader {
+	left: calc(20px + 15%);
+	top: 5px;
+	height: 3%;
+	width: 66%;
+}
+.breederLine {
+	position: relative;
+	height: 40px;
+	border-style: solid;
+	border-width: thin;
+	margin: 10px 10px;
+}
+.breederName {
+	position: absolute;
+	left: 5px;
+	font-size: x-large;
+	top: 50%;
+    transform: translate(0%, -50%);
+}
+.breederCosts {
+	position: absolute;
+	bottom: 0;
+	left:50%;
+    transform: translate(-50%, 0%);
+}
+.breederInfo {
+	position: absolute;
+	left: 50%;
+	top: 4px;
+    transform: translate(-50%, 0%);
+}
+.breederCount {
+	position:absolute;
+	right: 10px;
+	font-size: x-large;
+	top: 50%;
+    transform: translate(0%, -50%);
+}
+.statLine {
+	position: relative;
+	top: 20px;
+	text-align: center;
+	font-size: x-large;
+}
+.bugsPerSec {
+	font-size: large;
+}
+body {
+	margin:0;
+	padding:0;
+}
+ul,li {
+	padding: 0;
+	list-style: none; 
+}

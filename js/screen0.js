@@ -27,10 +27,10 @@ function checkTotals(){
 
 function blinkTitles(){
 	showTitle(screen0.blinkNo)
-	showTitle(screen0.blinkNo+1)
+	showTitle(screen0.blinkNo-1)
 	screen0.blinkNo++;
 	if (screen0.blinkNo >= 9) {
-		setTimeout(function(){parent.changeScreen(1);}, 300);
+		setTimeout(()=>{showTitle(9); parent.changeScreen(1);}, 150);
 		clearInterval(screen0.blinkInterval)
 	}
 }

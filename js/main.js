@@ -52,7 +52,6 @@ function removeCover(internalCall) {
 	if ((internalCall && screenState.pageLoaded) || (!internalCall && screenState.canEnd)) {
 		$('#coverScreen').toggleClass("hide");
 	} else if (!internalCall && !screenState.canEnd) {
-	console.log("g");
 		screenState.pageLoaded = true;
 	}
 }
