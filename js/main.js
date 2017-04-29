@@ -65,12 +65,97 @@ class GameState {
 	 */
 	constructor(data){
 		if (data){
-			this.bugs = data.bugs ? data.bugs : 0;
+			this.bugs = data.bugs || 0;
+			this.breeders = data.breeders || breederData;
 		} else {
 			this.bugs = 0;
+			this.breeders = breederData;
 		}
 		this.screenTotals = [9];
 	}
 }
-/** Used to allow for a new GameState to be created from a screen. */
+/* Used to allow for a new GameState to be created from a screen. */
 function newGameState(data){return new GameState(data); }
+/* Defines the base data for each breeder */
+var breederData = [
+	{
+		name: "One",
+		description: "The first breeder",
+		count: 0,
+		baseCost: 15,
+		rate: 0.3,
+		cost: 15
+	},
+	{
+		name: "Two",
+		description: "The second breeder",
+		count: 0,
+		baseCost: 15,
+		rate: 0.3,
+		cost: 15
+	},
+	{
+		name: "Three",
+		description: "The third breeder",
+		count: 0,
+		baseCost: 15,
+		rate: 0.3,
+		cost: 15
+	},
+	{
+		name: "Four",
+		description: "The fourth breeder",
+		count: 0,
+		baseCost: 15,
+		rate: 0.3,
+		cost: 15
+	},
+	{
+		name: "Five",
+		description: "The fifth breeder",
+		count: 0,
+		baseCost: 15,
+		rate: 0.3,
+		cost: 15
+	},
+	{
+		name: "Six",
+		description: "The sixth breeder",
+		count: 0,
+		baseCost: 15,
+		rate: 0.3,
+		cost: 15
+	},
+	{
+		name: "Seven",
+		description: "The seventh breeder",
+		count: 0,
+		baseCost: 15,
+		rate: 0.3,
+		cost: 15
+	},
+	{
+		name: "Eight",
+		description: "The eighth breeder",
+		count: 0,
+		baseCost: 15,
+		rate: 0.3,
+		cost: 15
+	},
+	{
+		name: "Nine",
+		description: "The ninth breeder",
+		count: 0,
+		baseCost: 15,
+		rate: 0.3,
+		cost: 15
+	},
+	{
+		name: "Ten",
+		description: "The tenth breeder",
+		count: 0,
+		baseCost: 15,
+		rate: 0.3,
+		cost: 15
+	}
+];

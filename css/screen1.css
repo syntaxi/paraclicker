@@ -2,6 +2,7 @@
 	position: fixed;
 }
 .bugClicker {
+	cursor: pointer;
 	left: calc(20px + 15%);
 	top: calc(25px + 3%);
 	right: calc(51% + 10px);
@@ -26,6 +27,8 @@
 	width: 66%;
 }
 .breederLine {
+	user-select: none;
+	cursor: pointer;
 	position: relative;
 	height: 40px;
 	border-style: solid;
