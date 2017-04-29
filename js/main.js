@@ -8,9 +8,7 @@ var screenState = {
  * Called in the head before the body and hence screen has loaded. Used to set localStorage if needed
  */
 function preloadPage(){
-	if(!localStorage["save"]) {
-		localStorage["save"] = JSON.stringify(new GameState());
-	}
+	localStorage["save"] = JSON.stringify(new GameState());
 }
 
 /**
