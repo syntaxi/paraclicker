@@ -29,7 +29,6 @@ function changeScreen(to){
  * On the third blink, stay black and load the next page after at least a second.
  */
 function blinkDiv(){
-	console.log("h");
 	$('#coverScreen').toggleClass("black");
 	$('#coverScreen').toggleClass("white");
 	screenState.blinks++;
@@ -64,9 +63,11 @@ class GameState {
 	constructor(data){
 		if (data){
 			this.bugs = data.bugs || 0;
+			this.bps = data.bsp || 0;
 			this.breeders = data.breeders || breederData;
 		} else {
 			this.bugs = 0;
+			this.bps = 0;
 			this.breeders = breederData;
 		}
 		this.screenTotals = [9];
@@ -81,32 +82,40 @@ var breederData = [
 		description: "The first breeder",
 		count: 0,
 		baseCost: 15,
-		rate: 0.3,
-		cost: 15
+		rate: 0.1,
+		cost: 15,
+		unlock: 0,
+		isHidden: false
 	},
 	{
 		name: "Two",
 		description: "The second breeder",
 		count: 0,
-		baseCost: 15,
-		rate: 0.3,
-		cost: 15
+		baseCost: 100,
+		rate: 1,
+		cost: 100,
+		unlock: 0,
+		isHidden: false
 	},
 	{
 		name: "Three",
 		description: "The third breeder",
 		count: 0,
-		baseCost: 15,
-		rate: 0.3,
-		cost: 15
+		baseCost: 1100,
+		rate: 8,
+		cost: 1100,
+		unlock: 0,
+		isHidden: false
 	},
 	{
 		name: "Four",
 		description: "The fourth breeder",
 		count: 0,
-		baseCost: 15,
-		rate: 0.3,
-		cost: 15
+		baseCost: 12000,
+		rate: 47,
+		cost: 12000,
+		unlock: 100,
+		isHidden: true
 	},
 	{
 		name: "Five",
@@ -114,46 +123,58 @@ var breederData = [
 		count: 0,
 		baseCost: 15,
 		rate: 0.3,
-		cost: 15
+		cost: 15,
+		unlock: 1000,
+		isHidden: true
 	},
 	{
 		name: "Six",
 		description: "The sixth breeder",
 		count: 0,
-		baseCost: 15,
-		rate: 0.3,
-		cost: 15
+		baseCost: 130000,
+		rate: 260,
+		cost: 130000,
+		unlock: 10000,
+		isHidden: true
 	},
 	{
 		name: "Seven",
 		description: "The seventh breeder",
 		count: 0,
-		baseCost: 15,
-		rate: 0.3,
-		cost: 15
+		baseCost: 1400000,
+		rate: 1400,
+		cost: 1400000,
+		unlock: 100000,
+		isHidden: true
 	},
 	{
 		name: "Eight",
 		description: "The eighth breeder",
 		count: 0,
-		baseCost: 15,
-		rate: 0.3,
-		cost: 15
+		baseCost: 20000000,
+		rate: 7800,
+		cost: 20000000,
+		unlock: 1000000,
+		isHidden: true
 	},
 	{
 		name: "Nine",
 		description: "The ninth breeder",
 		count: 0,
-		baseCost: 15,
-		rate: 0.3,
-		cost: 15
+		baseCost: 330000000,
+		rate: 44000,
+		cost: 330000000,
+		unlock: 10000000,
+		isHidden: true
 	},
 	{
 		name: "Ten",
 		description: "The tenth breeder",
 		count: 0,
-		baseCost: 15,
-		rate: 0.3,
-		cost: 15
+		baseCost: 5100000000,
+		rate: 260000,
+		cost: 5100000000,
+		unlock: 100000000,
+		isHidden: true
 	}
 ];
