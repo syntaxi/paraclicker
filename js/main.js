@@ -48,6 +48,9 @@ function blinkDiv(){
 function removeCover(internalCall) {
 	if ((internalCall && screenState.pageLoaded) || (!internalCall && screenState.canEnd)) {
 		$('#coverScreen').toggleClass("hide");
+		screenState.pageLoaded = false;
+		screenState.canEnd = false;
+		screenState.blinks = 0;
 	} else if (!internalCall && !screenState.canEnd) {
 		screenState.pageLoaded = true;
 	}
@@ -64,7 +67,10 @@ class GameState {
 		if (data){
 			this.bugs = data.bugs || 0;
 			this.bps = data.bsp || 0;
-			this.breeders = data.breeders || breederData;
+			this.breeders = []
+			for (var i = 0; i < data.breeders.length; i++) {
+				this.breeders.push(new Breeder(data.breeders[i]));
+			}
 		} else {
 			this.bugs = 0;
 			this.bps = 0;
@@ -75,106 +81,112 @@ class GameState {
 }
 /* Used to allow for a new GameState to be created from a screen. */
 function newGameState(data){return new GameState(data); }
+/**
+ * Class that represents a purchasable breeder
+ */
+class Breeder {
+	/**
+	 * @param {string | object} name Either the name of the breeder or the pure data object to use.
+	 * @param {string} desc Description of the breeder.
+	 * @param {ind} baseCost Base cost of the breeder.
+	 * @param {int | float} rate The rate of the breeder.
+	 * @param {int} unlock The value at which the breeder is unlocked. Use 0 for unlocked at start.
+	 * 
+	 */
+	constructor(name, desc, baseCost, rate, unlock){
+		if (desc) {
+			this.name = name || "Default";
+			this.description = desc || "Default";
+			this.rate = rate || 0.1;
+			this.unlock = unlock || 0;
+			this.baseCost = baseCost;
+			this.isHidden =  !!unlock;
+			this.count = 0;
+			this.cost = baseCost;
+		} else {
+			this.name = name.name;
+			this.description = name.description;
+			this.rate = name.rate;
+			this.unlock = name.unlock;
+			this.baseCost = name.baseCost;
+			this.isHidden = name.isHidden;
+			this.count = name.count;
+			this.cost = name.cost;
+		}
+	}
+	
+	/**
+	 * Attempts to buy one of the breeder.
+	 * @param {GameState} state The game state to use when purchasing the breeder.
+	 * @returns {boolean} Boolean that indicates if the purchase was successful.
+	 */
+	buy(state){
+		if (state.bugs >= this.cost) {
+			state.bugs -= this.cost;
+			state.bps += this.rate;
+			this.count++;
+			this.cost = Math.round(this.baseCost * Math.pow(1.05, this.count));
+			return true;
+		}
+		return false;
+	}
+}
+
+class Upgrade {
+	
+	constructor(name, desc, price, unlockFunc, purchaseFunc){
+		if (desc) {
+			this.name = name;
+			this.desc = desc;
+			this.price = price;
+			this.purchaseFunc = purchaseFunc;
+			this.bought = false;
+		} else {
+			this.name = name.name;
+			this.desc = name.desc;
+			this.price = name.price;
+			this.purchaseFunc = name.purchaseFunc;
+			this.bought = name.bought;
+		}
+	}
+	
+	buy(state){
+		if (state.bugs >= this.price) {
+			state.bugs -= this.price;
+			this.bought = true;
+			this.purchaseFunc(state);
+		}
+	}
+	
+	isUnlocked(state){
+		return unlockFunc(state)
+	}
+}
+
 /* Defines the base data for each breeder */
 var breederData = [
-	{
-		name: "One",
-		description: "The first breeder",
-		count: 0,
-		baseCost: 15,
-		rate: 0.1,
-		cost: 15,
-		unlock: 0,
-		isHidden: false
-	},
-	{
-		name: "Two",
-		description: "The second breeder",
-		count: 0,
-		baseCost: 100,
-		rate: 1,
-		cost: 100,
-		unlock: 0,
-		isHidden: false
-	},
-	{
-		name: "Three",
-		description: "The third breeder",
-		count: 0,
-		baseCost: 1100,
-		rate: 8,
-		cost: 1100,
-		unlock: 0,
-		isHidden: false
-	},
-	{
-		name: "Four",
-		description: "The fourth breeder",
-		count: 0,
-		baseCost: 12000,
-		rate: 47,
-		cost: 12000,
-		unlock: 100,
-		isHidden: true
-	},
-	{
-		name: "Five",
-		description: "The fifth breeder",
-		count: 0,
-		baseCost: 15,
-		rate: 0.3,
-		cost: 15,
-		unlock: 1000,
-		isHidden: true
-	},
-	{
-		name: "Six",
-		description: "The sixth breeder",
-		count: 0,
-		baseCost: 130000,
-		rate: 260,
-		cost: 130000,
-		unlock: 10000,
-		isHidden: true
-	},
-	{
-		name: "Seven",
-		description: "The seventh breeder",
-		count: 0,
-		baseCost: 1400000,
-		rate: 1400,
-		cost: 1400000,
-		unlock: 100000,
-		isHidden: true
-	},
-	{
-		name: "Eight",
-		description: "The eighth breeder",
-		count: 0,
-		baseCost: 20000000,
-		rate: 7800,
-		cost: 20000000,
-		unlock: 1000000,
-		isHidden: true
-	},
-	{
-		name: "Nine",
-		description: "The ninth breeder",
-		count: 0,
-		baseCost: 330000000,
-		rate: 44000,
-		cost: 330000000,
-		unlock: 10000000,
-		isHidden: true
-	},
-	{
-		name: "Ten",
-		description: "The tenth breeder",
-		count: 0,
-		baseCost: 5100000000,
-		rate: 260000,
-		cost: 5100000000,
-		unlock: 100000000,
-		isHidden: true
-	}
+	new Breeder("One", "The first breeder", 15, 0.1),
+	new Breeder("Two","The second breeder", 100, 1),
+	new Breeder("Three","The third breeder", 1100, 8),
+	new Breeder("Four","The fourth breeder", 12000, 47, 100),
+	new Breeder("Five","The fifth breeder", 15, 0.3, 1000),
+	new Breeder("Six","The sixth breeder", 130000, 260, 10000),
+	new Breeder("Seven","The seventh breeder", 1400000, 1400, 100000),
+	new Breeder("Eight","The eighth breeder", 20000000, 7800, 1000000),
+	new Breeder("Nine","The ninth breeder", 330000000, 44000, 10000000),
+	new Breeder("Ten","The tenth breeder", 5100000000, 260000, 100000000)
 ];
+
+var upgrades1 = [
+	new Upgrade("OneOne", "First upgrade for Breeder One", ),
+	new Upgrade("OneTwo", "Second upgrade for Breeder One"),
+	new Upgrade("OneThree", "Third upgrade for Breeder One"),
+	new Upgrade("OneFour", "Fourth upgrade for Breeder One"),
+	new Upgrade("OneFive", "Fifth upgrade for Breeder One"),
+	new Upgrade("OneSix", "Sixth upgrade for Breeder One"),
+	new Upgrade("OneSeven", "Seventh upgrade for Breeder One"),
+	new Upgrade("OneEight", "Eighth upgrade for Breeder One"),
+	new Upgrade("OneNine", "Ninth upgrade for Breeder One"),
+	new Upgrade("OneTen", "Tenth upgrade for Breeder One"),
+	new Upgrade("OneEleven", "Eleventh upgrade for Breeder One"),
+]
