@@ -71,8 +71,7 @@ function buyBreeder(id) {
  * Called when the main bug is clicked.
  */
 function bugClicked() {
-	//updateTotal(state.clickRate);
-	updateTotal(1000);
+	updateTotal(state.clickRate);
 }
 
 function buyUpgrade(id) {
