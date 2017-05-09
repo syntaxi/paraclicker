@@ -64,7 +64,7 @@ function removeCover(internalCall) {
  */
 class GameState {
 	constructor() {
-		this.bugs = 0;
+		this.larvae = 0;
 		this.clickRate = 1;
 		this.bps = 0;
 		this.breeders = breederData;
@@ -86,7 +86,7 @@ class GameState {
 	 */
 	convertToJson() {
 		var data = {}
-		data.bugs = this.bugs;
+		data.larvae = this.larvae;
 		data.clickRate = this.clickRate;
 		data.breeders = []
 		for (var i = 0; i < this.breeders.length; i++) {
@@ -103,7 +103,7 @@ class GameState {
 	 * @param {object} data The data to use to reconstruct the state
 	 */
 	updateFromJson(data) {
-		this.bugs = data.bugs;
+		this.larvae = data.larvae;
 		this.clickRate = data.clickRate;
 		this.breeders = [];
 		for (var i = 0; i < data.breeders.length; i++) {
@@ -147,8 +147,8 @@ class Breeder {
 	 * @returns {boolean} Boolean that indicates if the purchase was successful.
 	 */
 	buy(state){
-		if (state.bugs >= this.cost) {
-			state.bugs -= this.cost;
+		if (state.larvae >= this.cost) {
+			state.larvae -= this.cost;
 			this.count++;
 			this.cost = Math.round(this.baseCost * Math.pow(1.05, this.count));
 			state.recalcBps();
@@ -193,15 +193,17 @@ class Breeder {
 class Upgrade {
 	/**
 	 * @param {string|object} name Either the name of the upgrade or the data to use to create one
-	 * @param {string} desc The description of the upgrade
+	 * @param {string} description The description of the upgrade
+	 * @param {string} effect The effect of the upgrade
 	 * @param {int} price The price of the upgrade
 	 * @param {object} unlockData Data passed to the unlock function
 	 * @param {object} postBuyData Data passed to the post-purchase function
 	 */
-	constructor(name, desc, price, unlockData, postBuyData){
+	constructor(name, description, effect, cost, unlockData, postBuyData){
 		this.name = name;
-		this.desc = desc;
-		this.price = price;
+		this.description = description;
+		this.effect = effect;
+		this.cost = cost;
 		this.postBuyData = postBuyData;
 		this.unlockData = unlockData;
 		this.bought = false;
@@ -215,8 +217,8 @@ class Upgrade {
 	 * @return {boolean} Indication of if the purchase was successful
 	 */
 	buy(state){
-		if (state.bugs >= this.price) {
-			state.bugs -= this.price;
+		if (state.larvae >= this.cost) {
+			state.larvae -= this.cost;
 			this.bought = true;
 			this.postBuyFunc(state);
 			state.recalcBps();
@@ -250,9 +252,10 @@ class Upgrade {
 		var data = {};
 		data.bought = this.bought;
 		data.name = this.name;
-		data.desc = this.desc;
+		data.description = this.description;
+		data.effect = this.effect;
 		if (!this.bought) {
-			data.price = this.price;
+			data.cost = this.cost;
 			data.postBuyData = this.postBuyData;
 			data.unlockData = this.unlockData;
 		}
@@ -265,9 +268,10 @@ class Upgrade {
 	updateFromJson(data) {
 		this.bought = data.bought;
 		this.name = data.name;
-		this.desc = data.desc;
+		this.description = data.description;
+		this.effect = data.effect;
 		if (!this.bought) {
-			this.price = data.price;
+			this.cost = data.cost;
 			this.postBuyData = data.postBuyData;
 			this.unlockData = data.unlockData;
 		}
@@ -306,23 +310,33 @@ function genPostBuy(type, data, index) {
 
 
 var breederData = [
-	new Breeder("One", "The first breeder", 15, 0.1),
-	new Breeder("Two", "The second breeder", 100, 1),
-	new Breeder("Three", "The third breeder", 1100, 8),
-	new Breeder("Four", "The fourth breeder", 12000, 47, 100),
-	new Breeder("Five", "The fifth breeder", 15, 0.3, 1000),
-	new Breeder("Six", "The sixth breeder", 130000, 260, 10000),
-	new Breeder("Seven", "The seventh breeder", 1400000, 1400, 100000),
-	new Breeder("Eight", "The eighth breeder", 20000000, 7800, 1000000),
-	new Breeder("Nine", "The ninth breeder", 330000000, 44000, 10000000),
-	new Breeder("Ten", "The tenth breeder", 5100000000, 260000, 100000000)
+	new Breeder("Incubator", "Put eggs in. Wait a while. Get larvae out. It can't get simpler than this. Or more effective", 15, 0.1),
+	new Breeder("Coiled breeding", "If you put the eggs in just right, you can double your larvae. <br>Disclaimer: This doesn't get it just right.", 100, 1),
+	new Breeder("Degerminator", "Germs are bad, remove them. But just incase let's add a De-Degerminator. <br> But incase some bad germs get in we should have a De-De-Degerminator.", 1100, 8),
+	new Breeder("Fluid Stores", "Let's be real here I'm runnning out of ideas faster than your father ran when you were born. That is assuming you were born of course.", 12000, 47, 100),
+	new Breeder("Tinkertech", "I'm sorry, I've been trying to work on my personal development skills. My psychologist says that the bugs are bad for me. I offered to show her they were friendly but I don't think she liked my bee blanket", 62000, 143, 1000),
+	new Breeder("Nanodrone", "It's a drone. But nano. It's coolness is inversly propotional to it's size. It doesn't do anything however. Just looks cool", 130000, 260, 10000),
+	new Breeder("Growth Cauldrons", "It's a cauldron refrence! If I were smarter this description would have a Path to Victory joke. Alas, you are going to be disapointed.", 1400000, 1400, 100000),
+	new Breeder("Micromanager", "It's skitter, but in a machine! It's probably going to end terribly but until that point it works marvelously at hatching an army.. Wait.", 20000000, 7800, 1000000),
+	new Breeder("Lavaecage", "Don't worry it's not what you think. It's the birdcage but with lava.", 330000000, 44000, 10000000),
+	new Breeder("Garden", "DO NOT PICK THE FLOWERS. DO NOT PUT FLOWERS IN A VIAL. DO NOT DRINK THE VIAL.<br>FAILURE TO FOLLOW INSTRUCTIONS WILL RESULT IN PUNISHMENT BY WILDBOW.", 5100000000, 260000, 100000000)
 ];
 
 var upgradeData = [
-	new Upgrade("OneOne", "First upgrade for Breeder One", 100, [1, 0], [1, 2, 0]),
-	new Upgrade("OneTwo", "Second upgrade for Breeder One", 500, [1, 0], [1, 2, 0]),
-	new Upgrade("OneThree", "Third upgrade for Breeder One", 10000, [10, 0], [1, 2, 0]),
-	new Upgrade("OneFour", "Fourth upgrade for Breeder One", 100000, [20, 0], [2, 0.1, 0]),
-	new Upgrade("OneFive", "Fifth upgrade for Breeder One", 10000000, [40, 0], [2, 0.5, 0]),
-	new Upgrade("OneSix", "Sixth upgrade for Breeder One", 100000000, [80, 0], [2, 5, 0])
+	new Upgrade("Automatic Spinners", "Not having to manually spin eggs means more bugs", "Incubator produce doubled", 100, [1, 0], [1, 2, 0]),
+	new Upgrade("Reinforced mesh", "Turns out larvae can eat through anything. Except this. <small>I hope</small>", "Incubator produce doubled", 500, [1, 0], [1, 2, 0]),
+	new Upgrade("Temperature control", "Now proven to result in 100% less boiled eggs", "Incubator produce doubled", 10000, [10, 0], [1, 2, 0]),
+	new Upgrade("Quantum Entangment", "You never know what happens when Bakuda is nearby. I mean, aside from the explosions.", "Incubators gain + 0.1 for every non-incubator owned", 100000, [20, 0], [2, 0.1, 0]),
+	new Upgrade("Biomanipulation", "Panacea got involved. It ended badly, well except for the enhanced larvae", "Incubators gain + 0.5 for every non-incubator owned", 10000000, [40, 0], [2, 0.5, 0]),
+	new Upgrade("Puppetry", "Regent got involved. This also ended badly, just no useful bugs out of it.", "Incubators gain + 5 for every non-incubator owned", 100000000, [80, 0], [2, 5, 0])
 ]
+
+
+
+/*******************
+ * Cheat functions *
+ *******************/
+ 
+function giveBugs(num) {
+	document.getElementById('screenPanel').contentWindow.updateTotal(num);
+}

@@ -7,23 +7,23 @@
 	</head>
 	
 	<body>
+		<div class="tooltip bordered" id="tooltip"></div>
 		<div class="panel newsreader"></div>
-		<div class="panel bugClicker" onclick="bugClicked();">
+		<div class="panel bugClicker clickable" onclick="bugClicked();">
 			<img src="/images/bug.svg" width="100%" height="100%">
 		</div>
 		<div class="panel rateInfo">
-			<div class="bugCount statLine"><span id="bugCount">0</span> bugs have been hatched</div>
-			<div class="bugsPerSec statLine"><span id="bugsPerSec">0</span> bugs per second</div>
+			<div class="bugCount statLine"><span id="bugCount">0</span> larvae have been hatched</div>
+			<div class="larvaePerSec statLine"><span id="larvaePerSec">0</span> larvae per second</div>
 		</div>
-		<div class="panel upgrades">
+		<div class="panel upgrades" id="upgrades">
 			<div class="panel purchaseUpgrades" id="purchaseList">
 			</div>
-			<div class="existingUpgrades" id="#boughtList">
+				<div class="existingUpgrades" id="boughtList">
 			</div>
 		</div>
-		<div class="panel breeders">
-			<ul id="breederList">
-			</ul>
+		<div class="panel breeders" id="breeders">
+		
 		</div>
 		<script>onScreenLoad();</script>
 	</body>

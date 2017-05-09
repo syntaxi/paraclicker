@@ -6,24 +6,22 @@ body {
 	user-select: none;
 	margin:0;
 	padding:0;
-}
-ul, li {
-	padding: 0;
-	list-style: none; 
+	color: white;
+	overflow: hidden;
 }
 .bordered {
 	border-style: solid;
-	border-width: thin;
+	border-color: white;
+	border-width: 1px;
 }
-
-
-.bugClicker {
+.clickable {
 	cursor: pointer;
-	left: calc(20px + 15%);
-	top: calc(25px + 3%);
-	right: calc(51% + 10px);
-	height: 45%;
 }
+.clickable:hover {
+	box-shadow: 0 0 4px 0 #ffffff;
+	text-shadow: 0 0 4px #ffffff;
+}
+
 .newsreader {
 	left: calc(20px + 15%);
 	top: 5px;
@@ -32,33 +30,69 @@ ul, li {
 }
 
 
+/* Tooltips */
+.tooltip {
+	position: absolute;
+	padding: 5px;
+	background-color: #2d2d2d;
+	width: 240px;
+	height: 200px;
+	z-index:99;
+	text-align: center;
+}
+.tooltipName {
+	font-size: 25px;
+}
+.tooltipCount {
+	font-size: 15px;
+	font-style: italic;
+}
+.tooltipStats {
+	position: absolute;
+	font-size: 15px;
+	font-style: italic;
+	bottom: 0;
+	left: 50%;
+	width: 100%;
+	transform: translate(-50%, 0);
+}
+
+
 /* Upgrades */
 .upgrades {
-	left: calc(49% + 10px);
-	top: calc(25px + 3%);
-	width: 33%;
-	bottom: calc(60% + 40px);
+	right: calc(70% - 20px);
+	bottom: 20px;
+	height: 60%;
+	width: 30%;
+	display: flex;
+	flex-direction: column;
+	max-width: 300px;
+}
+.purchaseUpgrades:hover {
+	max-height: 40%;
+	overflow: auto;
+	height: auto;
 }
 .purchaseUpgrades {
 	position: relative;
-	width: calc(100% - 20px);
-	height: 50px;
+	height: 38px;
 	display: flex;
-	overflow: auto;
+	overflow: hidden;
+	flex-wrap: wrap;
 }
 .existingUpgrades {
+	margin: 10px 0;
 	position: relative;
-	height: calc(100% - 50px);
+	max-height: calc(100% - 37px);
 	display: flex;
 	flex-wrap: wrap;
 	overflow: auto;
 }
 .upgradeBox {
-	cursor: pointer;
 	flex: none;
 	width: 30px;
 	height: 30px;
-	margin: 1px 1px;
+	margin: 2px 2px 2px 2px;
 }
 .upgradeIcon {
 	object-fit: contain;
@@ -67,12 +101,23 @@ ul, li {
 }
 
 
-/* Info Panel */
+
+/* Bug Panels */
+.bugClicker {
+	top: calc(25% - 20px);
+	left: calc(30% + 40px);
+	width: 30%;
+	height: 45%;
+}
+.bugClicker:hover {
+	box-shadow: 0 0 0 0 #000000;
+	text-shadow: 0 0 0 #000000;
+}
 .rateInfo {
-	left: calc(20px + 15%);
-	top: calc(45px + 48%);
+	left: calc(30% + 40px);
+	width: 30%;
+	height: 30%;
 	bottom: 20px;
-	right: calc(51% + 10px);
 }
 .statLine {
 	position: relative;
@@ -80,37 +125,35 @@ ul, li {
 	text-align: center;
 	font-size: x-large;
 }
-.bugsPerSec {
+.larvaePerSec {
 	font-size: large;
 }
 
 
 /* Breeders */
 .breeders {
-	left: calc(49% + 10px);
-	bottom: 20px;
-	width: 33%;
-	height: 60%;
+	left: calc(70% - 20px);
+	bottom: 30px;
+	width: 30%;
+	max-width: 300px;
+	height: 80%;
 	overflow: auto;
 }
 .breederLine {
-	cursor: pointer;
 	position: relative;
-	height: 40px;
-	margin: 10px 10px;
+	height: 45px;
+	margin: 10px 0;
 }
 .breederName {
 	position: absolute;
 	left: 5px;
-	font-size: x-large;
-	top: 50%;
-    transform: translate(0%, -50%);
+	font-size: 23px;
+	top: 0;
 }
 .breederCosts {
 	position: absolute;
 	bottom: 0;
-	left:50%;
-    transform: translate(-50%, 0%);
+	left:30px;
 }
 .breederInfo {
 	position: absolute;

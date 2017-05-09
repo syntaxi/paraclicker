@@ -6,8 +6,8 @@ var screen0 = {'blinkNo':0}
  * Called when the screen is done loading. Ends the transition and gets some variables.
  */
 function onScreenLoad(){
-	state = parent.newGameState(JSON.parse(localStorage["save"]));
-	console.log(state)
+	state = parent.newGameState()
+	state.updateFromJson(JSON.parse(localStorage["save"]));
 	screen0.screenPanel = $('#screenPanel', window.parent.document);
 	screen0.bug = $('#bugIcon');
 }
@@ -21,8 +21,8 @@ function bugClicked(){
         top: Math.random() * (screen0.screenPanel.height() - 100) + 50,
         left: Math.random() * (screen0.screenPanel.width() - 100) + 50
     });
-	showTitle(state.bugs);
-	state.bugs++;
+	showTitle(state.larvae);
+	state.larvae++;
 	checkTotals();
 }
 
@@ -30,7 +30,7 @@ function bugClicked(){
  * Checks the total number of clicks to see if the game should progress to the next screen.
  */
 function checkTotals() {
-	if (state.bugs >= state.screenTotals[0]){
+	if (state.larvae >= state.screenTotals[0]){
 		localStorage["save"] = JSON.stringify(state);
 		screen0.blinkInterval = setInterval(blinkTitles, 100);
 	}
