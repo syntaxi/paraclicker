@@ -70,6 +70,7 @@ body {
 }
 .purchaseUpgrades:hover {
 	max-height: 40%;
+	min-height: 37px;
 	overflow: auto;
 	height: auto;
 }

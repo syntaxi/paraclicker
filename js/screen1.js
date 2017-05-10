@@ -6,9 +6,11 @@ var screen1 = {}
  * Called when the screen is loaded.
  */
 function onScreenLoad() {
-	state = parent.newGameState()
+	/* Load gamestate */
+	state = new GameState();
 	state.updateFromJson(JSON.parse(localStorage["save"]));
-	state.larvae = 9;
+	
+	/* load jquery objects */
 	screen1.bugCount = $("#bugCount");
 	screen1.tooltip = $("#tooltip");
 	screen1.larvaePerSec = $("#larvaePerSec");
@@ -16,15 +18,20 @@ function onScreenLoad() {
 	screen1.upgrades = $("#upgrades");
 	screen1.purchaseList = $("#purchaseList");
 	screen1.boughtList = $("#boughtList");
+	
+	/* Edit HTML */
 	generateBreederList();
 	generateUpgradeList();
 	displayTotal();
 	parent.removeCover();
+	screen1.tooltip.hide();
+	
+	/* Set intervals */
 	screen1.bpsInterval = setInterval(updateFromBPS, 50);
 	screen1.totalsInterval = setInterval(checkTotals, 1000);
+	screen1.saveInterval = setInterval(saveData, 1000);
 	screen1.breederList.mousemove(updateTooltipPos);
 	screen1.upgrades.mousemove(updateTooltipPos);
-	screen1.tooltip.hide();
 }
 
 /**
@@ -53,7 +60,6 @@ function buyBreeder(id) {
 			updateBreeder(id);
 			state.recalcBps();
 			displayTotal();
-			generateBreederTooltip(id)
 		}
 	}
 }
@@ -72,7 +78,7 @@ function buyUpgrade(id) {
 			moveToBought(id);
 			state.recalcBps();
 			displayTotal();
-			generateUpgradeTooltip(id)
+			mouseLeaveUpgrade();
 		}
 	}
 }
@@ -100,7 +106,6 @@ function mouseLeaveBreeder() {
  */
 function mouseEnterUpgrade(event) {
 	generateUpgradeTooltip(event.data.id);
-	console.log(screen1.upgrades.css("right"))
 	screen1.tooltip.css({right: parseInt(screen1.upgrades.css("right").slice(0, -2))-250});
 	screen1.tooltip.show();
 }
@@ -131,18 +136,27 @@ function updateFromBPS() {
  
 function checkTotals() {
 	for (var i = 0; i < state.breeders.length; i++) {
-		if (state.breeders[i].isHidden && state.larvae >= state.breeders[i].unlock ) {
+		if (!state.breeders[i].shown && state.larvae >= state.breeders[i].unlock ) {
 			addBreeder(i);
-			state.breeders[i].isHidden = false;
 		}
 	}
 	for (var i = 0; i < state.upgrades.length; i++) {
-		if (!state.upgrades[i].unlocked && state.upgrades[i].canUnlock(state)) {
+		if (state.upgrades[i].unlocked == 0 && state.upgrades[i].canUnlock(state)) {
+			state.upgrades[i].unlocked = 1;
 			addPurchaseUpgrade(i);
 		}
 	}
 }
 
+/**
+ * Saves the current game state.
+ * Automatically runs every second
+ */
+function saveData() {
+	localStorage["save"] = JSON.stringify(state.convertToJson());
+}
+ 
+ 
 /**
  * Called every time the mouse is moved in order to update the tooltip
  */
@@ -181,6 +195,7 @@ function updateBreeder(index) {
 function addBreeder(i) {
 	screen1.breederList.append(`<div class="breederLine clickable bordered" id="breeder${i}" onclick="buyBreeder(${i})"><span class="breederName" id="breederName${i}">${state.breeders[i].name}</span><span class="breederCosts" id="breederCosts${i}">${prettyNumber(state.breeders[i].cost)}</span><span class="breederCount" id="breederCount${i}">${prettyNumber(state.breeders[i].count)}</span></div>`);
 	$(`#breeder${i}`).mouseenter({id:i},mouseEnterBreeder).mouseleave({id:i},mouseLeaveBreeder);
+	state.breeders[i].shown = true;
 }
 
 /**
@@ -189,7 +204,8 @@ function addBreeder(i) {
  */
 function addPurchaseUpgrade(i) {
 	screen1.purchaseList.append(`<div class="bordered clickable upgradeBox" id="purchase${i}" onclick="buyUpgrade(${i})"><img class="upgradeIcon" src="/images/icons/upgradeIcon.png"></div>`);
-	$(`#purchase${i}`).mouseenter({id:i},mouseEnterUpgrade).mouseleave({id:i},mouseLeaveUpgrade);
+	$(`#purchase${i}`).mouseenter({id:i}, mouseEnterUpgrade).mouseleave({id:i}, mouseLeaveUpgrade);
+	state.upgrades[i].shown = true;
 }
 
 /**
@@ -219,7 +235,7 @@ function setTooltipContent(content) {
  */
 function generateBreederList() {
 	for (var i = 0; i < state.breeders.length; i++) {
-		if (!state.breeders[i].isHidden) {
+		if (state.breeders[i].unlock <= state.larvae) {
 			addBreeder(i);
 		}
 	}
@@ -230,10 +246,15 @@ function generateBreederList() {
  */
 function generateUpgradeList() {
 	for (var i = 0; i < state.upgrades.length; i++) {
-		if (state.upgrades[i].bought) {
-			addBoughtUpgrade(i);
-		} else if (state.upgrades[i].canUnlock(state)) {
-			addPurchaseUpgrade(i);
+		switch(state.upgrades[i].unlocked) {
+			case 0:
+				break;
+			case 1:
+				addPurchaseUpgrade(i);
+				break;
+			case 2:
+				addBoughtUpgrade(i);
+				break;
 		}
 	}
 }
