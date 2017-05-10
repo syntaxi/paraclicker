@@ -66,3 +66,8 @@ function removeCover(internalCall) {
 function giveBugs(num) {
 	document.getElementById('screenPanel').contentWindow.updateTotal(num);
 }
+
+function wipeSave() {
+	localStorage["save"] = JSON.stringify((new GameState()).convertToJson());
+	document.getElementById('screenPanel').contentWindow.location.reload();
+}

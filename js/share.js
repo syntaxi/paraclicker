@@ -5,18 +5,29 @@ class GameState {
 	constructor() {
 		this.larvae = 0;
 		this.clickRate = 1;
-		this.bps = 0;
+		this.lps = 0;
 		this.breeders = breederData;
 		this.upgrades = upgradeData;
 		this.screenTotals = [9];
 	}
 	/**
-	 * Recalulates the Bps from all sources
+	 * Recalulates the lps from all sources
 	 */
-	recalcBps() {
-		this.bps = 0
+	recalcLps() {
+		this.lps = 0;
+		var breederCounts = 0;
 		for (var i = 0; i < this.breeders.length; i++) {
-			this.bps += this.breeders[i].count * this.breeders[i].rate;
+			this.breeders[i].rate = this.breeders[i].baseRate;
+			breederCounts += this.breeders[i].count;
+		}
+		breederCounts -= this.breeders[0].count;
+		for (var i = 0; i < this.upgrades.length; i++) {
+			if (this.upgrades[i].unlocked == 2) {
+				this.upgrades[i].postBuyFunc(state, breederCounts);
+			}
+		}
+		for (var i = 0; i < this.breeders.length; i++) {
+			this.lps += this.breeders[i].count * this.breeders[i].rate;
 		}
 	}
 	/**
@@ -50,7 +61,7 @@ class GameState {
 		for (var i = 0; i < this.upgrades.length; i++) {
 			this.upgrades[i].updateFromJson(data.upgrades[i]);
 		}
-		this.recalcBps();
+		this.recalcLps();
 	}
 }
 
@@ -66,12 +77,13 @@ class Breeder {
 	 * @param {int} unlock The value at which the breeder is unlocked. Use 0 for unlocked at start.
 	 */
 	constructor(name, desc, baseCost, rate, unlock){
-		this.name = name || "Default";
-		this.description = desc || "Default";
-		this.rate = rate || 0.1;
-		this.unlock = unlock || 0;
+		this.name = name;
+		this.description = desc;
+		this.rate = rate;
 		this.baseCost = baseCost;
+		this.baseRate = rate
 		this.count = 0;
+		this.unlock = 0;
 		this.cost = baseCost;
 	}
 	/**
@@ -84,7 +96,7 @@ class Breeder {
 			state.larvae -= this.cost;
 			this.count++;
 			this.cost = Math.round(this.baseCost * Math.pow(1.05, this.count));
-			state.recalcBps();
+			state.recalcLps();
 			return true;
 		}
 		return false;
@@ -142,8 +154,7 @@ class Upgrade {
 		if (state.larvae >= this.cost) {
 			state.larvae -= this.cost;
 			this.unlocked = 2;
-			this.postBuyFunc(state);
-			state.recalcBps();
+			state.recalcLps();
 			return true;
 		}
 		return false;
@@ -190,6 +201,6 @@ function genPostBuy(type, data, index) {
 	if (type == 1) {
 		return function (state) {state.breeders[index].rate *= data; }
 	} else {
-		return function (state) {state.breeders[index].rate += data; }
+		return function (state, count) {state.breeders[index].rate += data*count; }
 	}
 }

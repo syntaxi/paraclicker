@@ -77,17 +77,21 @@ body {
 .purchaseUpgrades {
 	position: relative;
 	height: 38px;
-	display: flex;
 	overflow: hidden;
+	display: flex;
 	flex-wrap: wrap;
 }
 .existingUpgrades {
+	flex: 1;
+	
 	margin: 10px 0;
 	position: relative;
 	max-height: calc(100% - 37px);
+	
 	display: flex;
 	flex-wrap: wrap;
 	overflow: auto;
+	align-content: flex-start;
 }
 .upgradeBox {
 	flex: none;

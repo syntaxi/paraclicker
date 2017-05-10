@@ -27,7 +27,7 @@ function onScreenLoad() {
 	screen1.tooltip.hide();
 	
 	/* Set intervals */
-	screen1.bpsInterval = setInterval(updateFromBPS, 50);
+	screen1.lpsInterval = setInterval(updateFromLps, 50);
 	screen1.totalsInterval = setInterval(checkTotals, 1000);
 	screen1.saveInterval = setInterval(saveData, 1000);
 	screen1.breederList.mousemove(updateTooltipPos);
@@ -58,7 +58,7 @@ function buyBreeder(id) {
 		success = state.breeders[id].buy(state);
 		if (success) {
 			updateBreeder(id);
-			state.recalcBps();
+			state.recalcLps();
 			displayTotal();
 		}
 	}
@@ -76,7 +76,7 @@ function buyUpgrade(id) {
 		success = state.upgrades[id].buy(state);
 		if (success) {
 			moveToBought(id);
-			state.recalcBps();
+			state.recalcLps();
 			displayTotal();
 			mouseLeaveUpgrade();
 		}
@@ -124,10 +124,10 @@ function mouseLeaveUpgrade() {
  **********************/
  
 /**
- * Called every 50ms to update the total number of larvae with the bps.
+ * Called every 50ms to update the total number of larvae with the lps.
  */
-function updateFromBPS() {
-	updateTotal(state.bps*0.05);
+function updateFromLps() {
+	updateTotal(state.lps*0.05);
 }
 
 /**
@@ -176,7 +176,7 @@ function updateTooltipPos(event) {
  */
 function displayTotal() {
 	screen1.bugCount.html(prettyNumber(Math.round(state.larvae)));
-	screen1.larvaePerSec.html(prettyNumber(state.bps.toFixed(1)));
+	screen1.larvaePerSec.html(prettyNumber(state.lps.toFixed(1)));
 }
 
 /**
