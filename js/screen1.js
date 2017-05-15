@@ -193,7 +193,7 @@ function updateBreeder(index) {
  * @param {int} i The index of the breeder to add.
  */
 function addBreeder(i) {
-	screen1.breederList.append(`<div class="breederLine clickable bordered" id="breeder${i}" onclick="buyBreeder(${i})"><span class="breederName" id="breederName${i}">${state.breeders[i].name}</span><span class="breederCosts" id="breederCosts${i}">${prettyNumber(state.breeders[i].cost)}</span><span class="breederCount" id="breederCount${i}">${prettyNumber(state.breeders[i].count)}</span></div>`);
+	screen1.breederList.append(`<div class="breederLine clickable bordered" id="breeder${i}" onclick="buyBreeder(${i})"><img src="/images/icons/breeder${i}.png" class="breederIcon"><span class="breederName" id="breederName${i}">${state.breeders[i].name}</span><span class="breederCosts" id="breederCosts${i}">${prettyNumber(state.breeders[i].cost)}</span><span class="breederCount" id="breederCount${i}">${prettyNumber(state.breeders[i].count)}</span></div>`);
 	$(`#breeder${i}`).mouseenter({id:i},mouseEnterBreeder).mouseleave({id:i},mouseLeaveBreeder);
 	state.breeders[i].shown = true;
 }
@@ -263,14 +263,14 @@ function generateUpgradeList() {
  * Generates the tooltip html for a breeder
  */
 function generateBreederTooltip(id) {
-	setTooltipContent(`<div class="tooltipName">${state.breeders[id].name}</div><div class="tooltipCount">(${prettyNumber(state.breeders[id].count)} owned)</div><div class="tooltipInfo">${state.breeders[id].description}</div><div class="tooltipStats">Cost: ${prettyNumber(state.breeders[id].cost)} larvae<br>Will provide ${prettyNumber(state.breeders[id].rate)} larvae/second each</div>`);
+	setTooltipContent(`<img src="/images/icons/breeder${id}.png" class="tooltipIcon"><div class="tooltipName">${state.breeders[id].name}</div><div class="tooltipCount">(${prettyNumber(state.breeders[id].count)} owned)</div><div class="tooltipInfo">${state.breeders[id].description}</div><div class="tooltipStats">Cost: ${prettyNumber(state.breeders[id].cost)} larvae<br>Will provide ${prettyNumber(state.breeders[id].rate)} larvae/second each</div>`);
 }
 
 /**
  * Generates the tooltip html for an upgrade
  */
 function generateUpgradeTooltip(id) {
-	setTooltipContent(`<div class="tooltipName">${state.upgrades[id].name}</div><div class="tooltipInfo">${state.upgrades[id].description}</div><div class="tooltipStats">Cost: ${prettyNumber(state.upgrades[id].cost)} larvae<br>${state.upgrades[id].effect}</div>`);
+	setTooltipContent(`<div class="tooltipName">${state.upgrades[id].name}</div><br><div class="tooltipInfo">${state.upgrades[id].description}</div><div class="tooltipStats">Cost: ${prettyNumber(state.upgrades[id].cost)} larvae<br>${state.upgrades[id].effect}</div>`);
 }
 	
 /******************
