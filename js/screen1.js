@@ -1,37 +1,31 @@
 /* Global variables for the state and this screen */
+var screen1 = {currentCard: 0, cardClasses: ["off-left", "off-right","leave-left", "leave-right","enter-left", "enter-right"]}
 var state;
-var screen1 = {}
 
 /**
  * Called when the screen is loaded.
  */
-function onScreenLoad() {
+function onMobileLoaded() {
 	/* Load gamestate */
 	state = new GameState();
 	state.updateFromJson(JSON.parse(localStorage["save"]));
 	
 	/* load jquery objects */
+	screen1.breederList = $("#breederList");
 	screen1.bugCount = $("#bugCount");
-	screen1.tooltip = $("#tooltip");
 	screen1.larvaePerSec = $("#larvaePerSec");
-	screen1.breederList = $("#breeders");
-	screen1.upgrades = $("#upgrades");
-	screen1.purchaseList = $("#purchaseList");
-	screen1.boughtList = $("#boughtList");
+	screen1.cardIds = [$("#clicker"), $("#breeders"), $("#upgrades"),  $("#others")];
 	
 	/* Edit HTML */
 	generateBreederList();
 	generateUpgradeList();
 	displayTotal();
 	parent.removeCover();
-	screen1.tooltip.hide();
 	
 	/* Set intervals */
 	screen1.lpsInterval = setInterval(updateFromLps, 50);
 	screen1.totalsInterval = setInterval(checkTotals, 1000);
 	screen1.saveInterval = setInterval(saveData, 1000);
-	screen1.breederList.mousemove(updateTooltipPos);
-	screen1.upgrades.mousemove(updateTooltipPos);
 }
 
 /**
@@ -71,6 +65,10 @@ function bugClicked() {
 	updateTotal(state.clickRate);
 }
 
+/**
+ * Called when an upgrade purchase button is pressed
+ * @param {integer} id The id of the bought upgrade
+ */
 function buyUpgrade(id) {
 	if (id >= 0 && id < state.upgrades.length) {
 		success = state.upgrades[id].buy(state);
@@ -81,42 +79,6 @@ function buyUpgrade(id) {
 			mouseLeaveUpgrade();
 		}
 	}
-}
-
-/**
- * Called when the mouse enters a breeder
- */
-function mouseEnterBreeder(event, data) {
-	generateBreederTooltip(event.data.id);
-	screen1.tooltip.css({left: parseInt(screen1.breederList.css("left").slice(0, -2))-250});
-	screen1.tooltip.show();
-}
-
-/**
- * Called when the mouse leaves a breeder
- */
-function mouseLeaveBreeder() {
-	screen1.tooltip.html("");
-	screen1.tooltip.css("left", "");
-	screen1.tooltip.hide();
-}
-
-/**
- * Called when the mouse enters an upgrade
- */
-function mouseEnterUpgrade(event) {
-	generateUpgradeTooltip(event.data.id);
-	screen1.tooltip.css({right: parseInt(screen1.upgrades.css("right").slice(0, -2))-250});
-	screen1.tooltip.show();
-}
-
-/**
- * Called when the mouse leaves a upgrade
- */
-function mouseLeaveUpgrade() {
-	screen1.tooltip.html("");
-	screen1.tooltip.css("right", "");
-	screen1.tooltip.hide();
 }
 
 /**********************
@@ -133,7 +95,6 @@ function updateFromLps() {
 /**
  * Called every 3s to check the unlock totals
  */
- 
 function checkTotals() {
 	for (var i = 0; i < state.breeders.length; i++) {
 		if (!state.breeders[i].shown && state.larvae >= state.breeders[i].unlock ) {
@@ -155,21 +116,40 @@ function checkTotals() {
 function saveData() {
 	localStorage["save"] = JSON.stringify(state.convertToJson());
 }
- 
- 
-/**
- * Called every time the mouse is moved in order to update the tooltip
- */
-function updateTooltipPos(event) {
-	if (screen1.tooltip.is(":visible")) {
-		screen1.tooltip.css({top: Math.min(Math.max(event.pageY, 0), $(window).height()-240)});
-	}
-}
 
 
 /**************************
  * HTML editing functions *
  **************************/
+
+/**
+ * Display a card and hide the rest
+ * @param {integer} id The index of the card to switch to
+ */
+function showCard(id) {
+	function removeAll(id) {
+		for (var i = 0; i < screen1.cardClasses.length; i++) {
+			screen1.cardIds[id].removeClass(screen1.cardClasses[i]);
+		}
+	}
+	for (var i = 0; i < screen1.cardIds.length; i++) {
+		removeAll(i);
+	}
+	for (var i = 0; i < id; i++) {
+		screen1.cardIds[i].addClass("off-left");
+	}
+	if (id > screen1.currentCard) {
+		screen1.cardIds[screen1.currentCard].addClass("leave-left");
+		screen1.cardIds[id].addClass("enter-right");
+	} else if (id < screen1.currentCard) {
+		screen1.cardIds[screen1.currentCard].addClass("leave-right");
+		screen1.cardIds[id].addClass("enter-left");
+	}
+	for (var i = id+1; i < screen1.cardIds.length; i++) {
+		screen1.cardIds[i].addClass("off-right");
+	}
+	screen1.currentCard = id;
+}
 
 /**
  * Updates the displayed total larvae.
@@ -181,49 +161,65 @@ function displayTotal() {
 
 /**
  * Updates a breeders entry and recalculates the cost.
- * @param {integer} index The index of the breeder to update.
+ * @param {integer} id The index of the breeder to update.
  */
-function updateBreeder(index) {
-	$(`#breederCount${index}`).html(prettyNumber(state.breeders[index].count));
-	$(`#breederCosts${index}`).html(prettyNumber(state.breeders[index].cost));
+function updateBreeder(id) {
+	$(`.breederCount${id}`).html(prettyNumber(state.breeders[id].count));
+	$(`#breederCost${id}`).html(prettyNumber(state.breeders[id].cost));
 }
 
 /**
  * Adds a breeder to the html list.
- * @param {int} i The index of the breeder to add.
+ * @param {integer} id The index of the breeder to add.
  */
-function addBreeder(i) {
-	screen1.breederList.append(`<div class="breederLine clickable bordered" id="breeder${i}" onclick="buyBreeder(${i})"><img src="/images/icons/breeder${i}.png" class="breederIcon"><span class="breederName" id="breederName${i}">${state.breeders[i].name}</span><span class="breederCosts" id="breederCosts${i}">${prettyNumber(state.breeders[i].cost)}</span><span class="breederCount" id="breederCount${i}">${prettyNumber(state.breeders[i].count)}</span></div>`);
-	$(`#breeder${i}`).mouseenter({id:i},mouseEnterBreeder).mouseleave({id:i},mouseLeaveBreeder);
-	state.breeders[i].shown = true;
+function addBreeder(id) {
+	screen1.breederList.append(`
+	<li>
+		<div class="collapsible-header">
+			<span class="new badge breederCount${id}" data-badge-caption="">${prettyNumber(state.breeders[id].count)}</span>
+			${state.breeders[id].name}</div>
+		<div class="collapsible-body nopad">
+			<div class="breederDescription center-align">${state.breeders[id].description}</div>
+			<div class="breederStats center-align">
+				<b class="breederCount${id}">${prettyNumber(state.breeders[id].count)}</b>
+				 foragers producing 
+				<b id="breederRate${id}">${prettyNumber(state.breeders[id].rate)}</b> 
+				 larvae/second each
+			</div>
+			<div class="buyContainer">
+				<a class="buyButton nopad waves-effect waves-teal btn-flat" onclick="buyBreeder(${id});">
+					<div class="buyCount center-align">Buy 1</div>
+					<div class="buyCost center-align" id="breederCost${id}">${prettyNumber(state.breeders[id].cost)}</div>
+				</a>
+			</div>
+		</div>
+	</li>`);
+	state.breeders[id].shown = true;
 }
 
 /**
  * Adds an upgrade to the html purchase list.
- * @param {int} i The index of the upgrade to add.
+ * @param {integer} id The index of the upgrade to add.
  */
-function addPurchaseUpgrade(i) {
-	screen1.purchaseList.append(`<div class="bordered clickable upgradeBox" id="purchase${i}" onclick="buyUpgrade(${i})"><img class="upgradeIcon" src="/images/icons/upgradeIcon.png"></div>`);
-	$(`#purchase${i}`).mouseenter({id:i}, mouseEnterUpgrade).mouseleave({id:i}, mouseLeaveUpgrade);
-	state.upgrades[i].shown = true;
+function addPurchaseUpgrade(id) {
+	
 }
 
 /**
  * Adds an upgrade to the html bought list and removes it from the buyable list
- * @param {int} i The index of the upgrade to remove & add.
+ * @param {integer} id The index of the upgrade to remove & add.
  */
-function addBoughtUpgrade(i) {
-	screen1.boughtList.append(`<div class="bordered upgradeBox" id="bought${i}"><img class="upgradeIcon" src="/images/icons/upgradeIcon.png"></div>`);
-	$(`#bought${i}`).mouseenter({id:i},mouseEnterUpgrade).mouseleave({id:i},mouseLeaveUpgrade);
+function addBoughtUpgrade(id) {
+	
 }
 
+/**
+ * Moves an upgrade from purchased to bought
+ * @param {integer} id The index of the upgrade to remove
+ */
 function moveToBought(id) {
-	$(`#purchase${id}`).remove();
+	$(`#upgrade${id}`).remove();
 	addBoughtUpgrade(id);
-}
-
-function setTooltipContent(content) {
-	screen1.tooltip.html(content);
 }
 	
 /*****************************
@@ -258,33 +254,3 @@ function generateUpgradeList() {
 		}
 	}
 }
-
-/**
- * Generates the tooltip html for a breeder
- */
-function generateBreederTooltip(id) {
-	setTooltipContent(`<img src="/images/icons/breeder${id}.png" class="tooltipIcon"><div class="tooltipName">${state.breeders[id].name}</div><div class="tooltipCount">(${prettyNumber(state.breeders[id].count)} owned)</div><div class="tooltipInfo">${state.breeders[id].description}</div><div class="tooltipStats">Cost: ${prettyNumber(state.breeders[id].cost)} larvae<br>Will provide ${prettyNumber(state.breeders[id].rate)} larvae/second each</div>`);
-}
-
-/**
- * Generates the tooltip html for an upgrade
- */
-function generateUpgradeTooltip(id) {
-	setTooltipContent(`<div class="tooltipName">${state.upgrades[id].name}</div><br><div class="tooltipInfo">${state.upgrades[id].description}</div><div class="tooltipStats">Cost: ${prettyNumber(state.upgrades[id].cost)} larvae<br>${state.upgrades[id].effect}</div>`);
-}
-	
-/******************
- * Misc functions *
- ******************/
-
-/**
- * Cnnverts a number to a prettier format
- * @param {int} num The number to prettify
- * @returns {int} A more readable version with SI prefixes
- */
-function prettyNumber(num) {
-	var power = Math.floor(Math.log(num) * Math.LOG10E/3) || 0;
-	return power < 2 ? num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : Math.round(num/Math.pow(10,power*3)*100)/100 + prefixes[power];
-}
-
-var prefixes = ["",""," Million", " Billion", " Trillion", " Quadrillion", " Quintillion", " Sextillion", " Septillion", " Octillion", " Nonillion", " Decillion", " Undecillion", " Duodecillion", " Tredecillion", " Quattuordecillion", " Quinquadecillion", " Sedecillion", " Septendecillion", " Octodecillion", " Novendecillion", " Vigintillion", " Unvigintillion", " Duovigintillion", " Tresvigintillion", " Quattuorvigintillion", " Quinquavigintillion", " Sesvigintillion", " Septemvigintillion", " Octovigintillion", " Novemvigintillion", " Trigintillion", " Untrigintillion", " Duotrigintillion", " Trestrigintillion", " Quattuortrigintillion", " Quinquatrigintillion", " Sestrigintillion", " Septentrigintillion", " Octotrigintillion", " Noventrigintillion", " Quadragintillion"]

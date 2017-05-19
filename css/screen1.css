@@ -1,192 +1,99 @@
-/* Generic */
-.panel {
-	position: fixed;
-}
 body {
-	user-select: none;
-	margin:0;
-	padding:0;
-	color: white;
-	overflow: hidden;
+	overflow-x: hidden;
 }
-.bordered {
-	border-style: solid;
-	border-color: white;
-	border-width: 1px;
-}
-.clickable {
-	cursor: pointer;
-}
-.clickable:hover {
-	box-shadow: 0 0 4px 0 #ffffff;
-	text-shadow: 0 0 4px #ffffff;
-}
-
-.newsreader {
-	left: calc(20px + 15%);
-	top: 5px;
-	height: 3%;
-	width: 66%;
-}
-
-
-/* Tooltips */
-.tooltip {
+.panel {
 	position: absolute;
+	top: 104px;
+	width: calc(100% - 20px);
+}
+.card {
+	margin: 10px 10px;
+}
+.nopad {
 	padding: 5px;
-	background-color: #2d2d2d;
-	width: 240px;
-	height: 200px;
-	z-index:99;
+}
+
+
+.breederDescription {
+	font-style: italic;
+	font-size: 0.8em;
+}
+.buyContainer {
+	display: flex;
+	flex-direction: row;
+}
+.buyButton {
+	line-height: 1em;
+	flex-grow: 1;
 	text-align: center;
 }
-.tooltipName {
-	width: 300px;
-	font-size: 25px;
+.breederStats {
+	font-size: 0.9em
 }
-.tooltipCount {
-	width: 300px;
-	font-size: 15px;
-	font-style: italic;
-}
-.tooltipStats {
+.buyCost {
 	position: absolute;
-	font-size: 15px;
-	font-style: italic;
-	bottom: 0;
-	left: 50%;
+	bottom: 2px;
 	width: 100%;
-	transform: translate(-50%, 0);
+	font-size: 0.8em;
 }
-.tooltipIcon {
+.buyCount {
 	position: absolute;
-	left: 0;
-	top: 0;
-	width: 50px;
-}
-
-
-/* Upgrades */
-.upgrades {
-	right: calc(70% - 20px);
-	bottom: 20px;
-	height: 60%;
-	width: 30%;
-	display: flex;
-	flex-direction: column;
-	max-width: 300px;
-}
-.purchaseUpgrades:hover {
-	max-height: 40%;
-	min-height: 37px;
-	overflow: auto;
-	height: auto;
-}
-.purchaseUpgrades {
-	position: relative;
-	height: 38px;
-	overflow: hidden;
-	display: flex;
-	flex-wrap: wrap;
-}
-.existingUpgrades {
-	flex: 1;
-	
-	margin: 10px 0;
-	position: relative;
-	max-height: calc(100% - 37px);
-	
-	display: flex;
-	flex-wrap: wrap;
-	overflow: auto;
-	align-content: flex-start;
-}
-.upgradeBox {
-	flex: none;
-	width: 30px;
-	height: 30px;
-	margin: 2px 2px 2px 2px;
-}
-.upgradeIcon {
-	object-fit: contain;
 	width: 100%;
-	height: 100%;
+	top: 2px;
 }
 
 
-/* Bug Panels */
-.bugClicker {
-	top: calc(25% - 20px);
-	left: calc(30% + 40px);
-	width: 30%;
-	height: 45%;
-}
-.bugClicker:hover {
-	box-shadow: 0 0 0 0 #000000;
-	text-shadow: 0 0 0 #000000;
-}
-.rateInfo {
-	left: calc(30% + 40px);
-	width: 30%;
-	height: 30%;
-	bottom: 20px;
-}
-.statLine {
-	position: relative;
-	top: 20px;
-	text-align: center;
-	font-size: x-large;
-}
-.larvaePerSec {
-	font-size: large;
+.clickerImage {
+	width: 100%;
 }
 
-
-/* Breeders */
-.breeders {
-	left: calc(70% - 20px);
-	bottom: 30px;
-	width: 30%;
-	max-width: 300px;
-	height: 80%;
-	overflow: auto;
+@keyframes move-off-right {
+	0% {
+		left: 0;
+	}
+	100% {
+		left: calc(100% - 10px);
+	}
 }
-.breederLine {
-	position: relative;
-	height: 45px;
-	margin: 10px 0;
+@keyframes move-off-left {
+	0% {
+		right: 0;
+	}
+	100% {
+		right: calc(100% - 10px);
+	}
 }
-.breederName {
-	position: absolute;
-	left: 5px;
-	font-size: 23px;
-	top: 0;
+@keyframes move-in-right {
+	0% {
+		left: calc(100% - 10px);
+	}
+	100% {
+		left: 0;
+	}
 }
-.breederCosts {
-	position: absolute;
-	bottom: 0;
-	left:30px;
+@keyframes move-in-left {
+	0% {
+		right: calc(100% - 10px);
+	}
+	100% {
+		right: 0;
+	}
 }
-.breederInfo {
-	position: absolute;
-	left: 50%;
-	top: 4px;
-    transform: translate(-50%, 0%);
+.off-right {
+	left: calc(100% - 10px);
 }
-.breederCount {
-	position:absolute;
-	right: 10px;
-	font-size: x-large;
-	top: 50%;
-    transform: translate(0%, -50%);
+.off-left {
+	right: calc(100% - 10px);
 }
-.breederIcon {
-	height: 100%;
-	display: none;
+.leave-left {
+	animation: move-off-left 195ms cubic-bezier(0.4, 0.0, 0.6, 1);
 }
-
-@media (min-width: 850px) {
-	.breederIcon {display: block;}
-	.breederName {left: 50px;}
-	.breederCosts {left:75px;}
+.leave-right {
+	animation: move-off-right 195ms cubic-bezier(0.4, 0.0, 0.6, 1);
+}
+.enter-right {
+	animation: move-in-right 225ms cubic-bezier(0.0, 0.0, 0.2, 1);
+}
+.enter-left {
+	animation: move-in-left 225ms cubic-bezier(0.0, 0.0, 0.2, 1);
 }

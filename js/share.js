@@ -204,3 +204,16 @@ function genPostBuy(type, data, index) {
 		return function (state, count) {state.breeders[index].rate += data*count; }
 	}
 }
+
+
+/**
+ * Cnnverts a number to a prettier format
+ * @param {int} num The number to prettify
+ * @returns {int} A more readable version with SI prefixes
+ */
+function prettyNumber(num) {
+	var power = Math.floor(Math.log(num) * Math.LOG10E/3) || 0;
+	return power < 2 ? num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : Math.round(num/Math.pow(10,power*3)*100)/100 + prefixes[power];
+}
+
+var prefixes = ["",""," Million", " Billion", " Trillion", " Quadrillion", " Quintillion", " Sextillion", " Septillion", " Octillion", " Nonillion", " Decillion", " Undecillion", " Duodecillion", " Tredecillion", " Quattuordecillion", " Quinquadecillion", " Sedecillion", " Septendecillion", " Octodecillion", " Novendecillion", " Vigintillion", " Unvigintillion", " Duovigintillion", " Tresvigintillion", " Quattuorvigintillion", " Quinquavigintillion", " Sesvigintillion", " Septemvigintillion", " Octovigintillion", " Novemvigintillion", " Trigintillion", " Untrigintillion", " Duotrigintillion", " Trestrigintillion", " Quattuortrigintillion", " Quinquatrigintillion", " Sestrigintillion", " Septentrigintillion", " Octotrigintillion", " Noventrigintillion", " Quadragintillion"]
