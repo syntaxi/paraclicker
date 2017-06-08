@@ -3,12 +3,14 @@
  */
 class GameState {
 	constructor() {
-		this.larvae = 0;
+		this._larvae = 0;
 		this.clickRate = 1;
 		this.lps = 0;
 		this.breeders = breederData;
 		this.upgrades = upgradeData;
 		this.screenTotals = [9];
+		this.nextBreederUnlock = 3;
+		this.nextUpgradeUnlock = 0;
 	}
 	/**
 	 * Recalulates the lps from all sources
@@ -30,14 +32,30 @@ class GameState {
 			this.lps += this.breeders[i].count * this.breeders[i].rate;
 		}
 	}
+	
+	/* So that the display is always updated when the larvae is changed */
+	get larvae() {
+		return this._larvae
+	}
+	set larvae(val) {
+		this._larvae = val;
+		(typeof displayTotal !== 'undefined' ? displayTotal : this.defaultFunction)();
+	}
+	
+	defaultFunction() {
+		console.warn("Operating without any context");
+	}
+	
 	/**
 	 * Converts the state into a jsonable format.
 	 * @returns {object} A minimum jsonable version of this state
 	 */
 	convertToJson() {
 		var data = {}
-		data.larvae = this.larvae;
+		data.larvae = this._larvae;
 		data.clickRate = this.clickRate;
+		data.nextBreederUnlock = this.nextBreederUnlock;
+		data.nextUpgradeUnlock = this.nextUpgradeUnlock;
 		data.breeders = []
 		for (var i = 0; i < this.breeders.length; i++) {
 			data.breeders.push(this.breeders[i].convertToJson());
@@ -53,8 +71,10 @@ class GameState {
 	 * @param {object} data The data to use to reconstruct the state
 	 */
 	updateFromJson(data) {
-		this.larvae = data.larvae;
+		this._larvae = data.larvae;
 		this.clickRate = data.clickRate;
+		this.nextBreederUnlock = data.nextBreederUnlock;
+		this.nextUpgradeUnlock = data.nextUpgradeUnlock;
 		for (var i = 0; i < this.breeders.length; i++) {
 			this.breeders[i].updateFromJson(data.breeders[i]);
 		}
@@ -62,6 +82,19 @@ class GameState {
 			this.upgrades[i].updateFromJson(data.upgrades[i]);
 		}
 		this.recalcLps();
+	}
+	
+	/**
+	 * Handles saving the gamestate
+	 */
+	save() {
+		localStorage['save'] = JSON.stringify(this.convertToJson());
+	}
+	/**
+	 * Handles loading the gamestate
+	 */
+	load() {
+		this.updateFromJson(JSON.parse(localStorage['save']));
 	}
 }
 
@@ -83,7 +116,7 @@ class Breeder {
 		this.baseCost = baseCost;
 		this.baseRate = rate
 		this.count = 0;
-		this.unlock = 0;
+		this.unlock = unlock;
 		this.cost = baseCost;
 	}
 	/**
@@ -106,19 +139,15 @@ class Breeder {
 	 * @return {object} A minimum data object to reconstruct this instance
 	 */
 	convertToJson() {
-		var data = {
-			rate: this.rate,
-			count: this.count
-		}
-		return data
+		return [this.rate, this.count]
 	}
 	/**
 	 * Update this instance with the json data
 	 * @param {object} data The data to update with
 	 */
 	updateFromJson(data) {
-		this.rate = data.rate;
-		this.count = data.count;
+		this.rate = data[0];
+		this.count = data[1];
 		this.cost = Math.round(this.baseCost * Math.pow(1.05, this.count));
 	}
 }
@@ -175,16 +204,14 @@ class Upgrade {
 	 * @return {object} A minimum data object to reconstruct this instance
 	 */
 	convertToJson() {
-		var data = {};
-		data.unlocked = this.unlocked;
-		return data;
+		return this.unlocked;
 	}
 	/**
 	 * Update this instance with the json data
 	 * @param {object} data The data to update with
 	 */
 	updateFromJson(data) {
-		this.unlocked = data.unlocked;
+		this.unlocked = data;
 	}
 }
 
@@ -193,7 +220,6 @@ class Upgrade {
  * Closures? Factories *
  ***********************/
 function genUnlock(min, index) {
-	var i = index;
 	return function (state) {return state.breeders[index].count >= min}
 }
 
@@ -207,13 +233,20 @@ function genPostBuy(type, data, index) {
 
 
 /**
+ * Records an advance to the next stage
+ */
+function nextStage() {
+	localStorage["stage"] = JSON.stringify(JSON.parse(localStorage['stage'])+1)
+}
+
+/**
  * Cnnverts a number to a prettier format
  * @param {int} num The number to prettify
- * @returns {int} A more readable version with SI prefixes
+ * @returns {string} A more readable version with SI prefixes
  */
 function prettyNumber(num) {
 	var power = Math.floor(Math.log(num) * Math.LOG10E/3) || 0;
-	return power < 2 ? num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : Math.round(num/Math.pow(10,power*3)*100)/100 + prefixes[power];
+	return power < 2 ? (num).toFixed(1).replace(/\B(?=(\d{3})+(?!\d))/g, ",") : (num/Math.pow(10,power*3)).toFixed(1) + prefixes[power];
 }
 
 var prefixes = ["",""," Million", " Billion", " Trillion", " Quadrillion", " Quintillion", " Sextillion", " Septillion", " Octillion", " Nonillion", " Decillion", " Undecillion", " Duodecillion", " Tredecillion", " Quattuordecillion", " Quinquadecillion", " Sedecillion", " Septendecillion", " Octodecillion", " Novendecillion", " Vigintillion", " Unvigintillion", " Duovigintillion", " Tresvigintillion", " Quattuorvigintillion", " Quinquavigintillion", " Sesvigintillion", " Septemvigintillion", " Octovigintillion", " Novemvigintillion", " Trigintillion", " Untrigintillion", " Duotrigintillion", " Trestrigintillion", " Quattuortrigintillion", " Quinquatrigintillion", " Sestrigintillion", " Septentrigintillion", " Octotrigintillion", " Noventrigintillion", " Quadragintillion"]

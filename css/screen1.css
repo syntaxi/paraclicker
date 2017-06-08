@@ -1,3 +1,9 @@
+/*******
+* Main *
+*******/
+.nopad {
+	padding: 5px;
+}
 body {
 	overflow-x: hidden;
 }
@@ -9,15 +15,14 @@ body {
 .card {
 	margin: 10px 10px;
 }
-.nopad {
-	padding: 5px;
-}
-
-
-.breederDescription {
+.flavourText {
 	font-style: italic;
 	font-size: 0.8em;
 }
+
+/***********
+* Breeders *
+***********/
 .buyContainer {
 	display: flex;
 	flex-direction: row;
@@ -42,17 +47,48 @@ body {
 	top: 2px;
 }
 
+/***********
+* Upgrades *
+***********/
+.upgradeShelf {
+	max-height: 200px;
+	overflow: auto;
+	min-height: 41px;
+	display: flex;
+	flex-wrap: wrap;
+}
+.upgradeContainer {
+	width: 100%;
+}
+.upgradeBox {
+	margin: 2px;
+	height: 37px;
+	width: 37px;
+	background-color: #ee6e73;
+}
+.upgradeIcon {
+	width: 100%;
+}
+.upgradeTitle {
+	font-size: 1.5rem;
+}
 
+/**********
+* Clicker *
+**********/
 .clickerImage {
 	width: 100%;
 }
 
+/*************
+* Main Cards *
+*************/
 @keyframes move-off-right {
 	0% {
 		left: 0;
 	}
 	100% {
-		left: calc(100% - 10px);
+		left: 100%;
 	}
 }
 @keyframes move-off-left {
@@ -60,12 +96,22 @@ body {
 		right: 0;
 	}
 	100% {
-		right: calc(100% - 10px);
+		right: 100%;
+	}
+}
+@keyframes move-off-bottom {
+	0% {
+		top: 0;
+		visibility: visible;
+	}
+	100% {
+		top: 100px;
+		visibility: hidden;
 	}
 }
 @keyframes move-in-right {
 	0% {
-		left: calc(100% - 10px);
+		left: 100%;
 	}
 	100% {
 		left: 0;
@@ -73,17 +119,31 @@ body {
 }
 @keyframes move-in-left {
 	0% {
-		right: calc(100% - 10px);
+		right: 100%;
 	}
 	100% {
 		right: 0;
 	}
 }
+@keyframes move-in-bottom {
+	0% {
+		top: 100px;
+		visibility: hidden;
+	}
+	100% {
+		top: 0;
+		visibility: visible;
+	}
+}
 .off-right {
-	left: calc(100% - 10px);
+	left: 100%;
 }
 .off-left {
-	right: calc(100% - 10px);
+	right: 100%;
+}
+.off-bottom {
+	top: 100px;
+	visibility: hidden;
 }
 .leave-left {
 	animation: move-off-left 195ms cubic-bezier(0.4, 0.0, 0.6, 1);
@@ -91,9 +151,15 @@ body {
 .leave-right {
 	animation: move-off-right 195ms cubic-bezier(0.4, 0.0, 0.6, 1);
 }
+.leave-bottom {
+	animation: move-off-bottom 195ms cubic-bezier(0.4, 0.0, 0.6, 1);
+}
 .enter-right {
 	animation: move-in-right 225ms cubic-bezier(0.0, 0.0, 0.2, 1);
 }
 .enter-left {
 	animation: move-in-left 225ms cubic-bezier(0.0, 0.0, 0.2, 1);
+}
+.enter-bottom {
+	animation: move-in-bottom 225ms cubic-bezier(0.0, 0.0, 0.2, 1);
 }

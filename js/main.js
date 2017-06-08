@@ -2,14 +2,37 @@
 var screenState = {
 	'blinks': 0,
 	'canEnd': false,
-	"pageLoaded": false};
+	"pageLoaded": false,
+	stage: 0};
 
 /**
  * Called in the head before the body and hence screen has loaded. Used to set localStorage if needed
  */
-function preloadPage(){
+function preloadPage() {
+	screenState.stage = 0
+	if (!localStorage["stage"]) {
+		localStorage["stage"] = "0"
+	} else {
+		screenState.stage = JSON.parse(localStorage['stage'])
+	}
 	if (!localStorage["save"]) {
-		localStorage["save"] = JSON.stringify((new GameState()).convertToJson());
+		(new GameState()).save();
+	}
+}
+
+/* Called once the frame has loaded */
+function postloadPage() {
+	var screenPanel = $('#screenPanel');
+	switch(screenState.stage) {
+		case 0:
+			screenPanel.attr('src','/screens/screen0.html')
+			break;
+		case 1:
+			screenPanel.attr('src','/screens/screen1.html')
+			break;
+		default:
+			console.error("Invalid stage defined");
+			break;
 	}
 }
 
@@ -64,10 +87,11 @@ function removeCover(internalCall) {
  *******************/
  
 function giveBugs(num) {
-	document.getElementById('screenPanel').contentWindow.updateTotal(num);
+	document.getElementById('screenPanel').contentWindow.state.larvae += num;
 }
 
 function wipeSave() {
-	localStorage["save"] = JSON.stringify((new GameState()).convertToJson());
-	document.getElementById('screenPanel').contentWindow.location.reload();
+	localStorage.removeItem('save')
+	localStorage.removeItem('stage')
+	document.location.reload();
 }
