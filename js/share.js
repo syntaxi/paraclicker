@@ -231,7 +231,9 @@ function genPostBuy(type, data, index) {
 	}
 }
 
-
+/*********************
+ * Utility Functions *
+ *********************/
 /**
  * Records an advance to the next stage
  */
@@ -248,5 +250,4 @@ function prettyNumber(num) {
 	var power = Math.floor(Math.log(num) * Math.LOG10E/3) || 0;
 	return power < 2 ? (num).toFixed(1).replace(/\B(?=(\d{3})+(?!\d))/g, ",") : (num/Math.pow(10,power*3)).toFixed(1) + prefixes[power];
 }
-
 var prefixes = ["",""," Million", " Billion", " Trillion", " Quadrillion", " Quintillion", " Sextillion", " Septillion", " Octillion", " Nonillion", " Decillion", " Undecillion", " Duodecillion", " Tredecillion", " Quattuordecillion", " Quinquadecillion", " Sedecillion", " Septendecillion", " Octodecillion", " Novendecillion", " Vigintillion", " Unvigintillion", " Duovigintillion", " Tresvigintillion", " Quattuorvigintillion", " Quinquavigintillion", " Sesvigintillion", " Septemvigintillion", " Octovigintillion", " Novemvigintillion", " Trigintillion", " Untrigintillion", " Duotrigintillion", " Trestrigintillion", " Quattuortrigintillion", " Quinquatrigintillion", " Sestrigintillion", " Septentrigintillion", " Octotrigintillion", " Noventrigintillion", " Quadragintillion"]

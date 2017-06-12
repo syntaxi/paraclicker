@@ -1,3 +1,19 @@
+/**************
+* Orientation *
+**************/
+
+@media (min-aspect-ratio: 1/1) {
+	#portrait {
+		display: none;
+		text-decoration: italic;
+	}
+}
+@media (max-aspect-ratio: 1/1) {
+	#landscape {
+		display: none;
+		text-decoration: italic;
+	}
+}
 /*******
 * Main *
 *******/

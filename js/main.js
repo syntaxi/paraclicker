@@ -23,16 +23,23 @@ function preloadPage() {
 /* Called once the frame has loaded */
 function postloadPage() {
 	var screenPanel = $('#screenPanel');
-	switch(screenState.stage) {
-		case 0:
-			screenPanel.attr('src','/screens/screen0.html')
-			break;
-		case 1:
-			screenPanel.attr('src','/screens/screen1.html')
-			break;
-		default:
-			console.error("Invalid stage defined");
-			break;
+	if (screenState.stage >= 0 && screenState.stage < 2) {
+		screenState.stage = 1
+		var width = document.documentElement.clientWidth;
+		var height = document.documentElement.clientHeight;
+		var client = 'desktop';
+		/* Mobile client */
+		if (window.matchMedia("(max-width: 720px)").matches) {
+			client = 'mobile';
+		/* Tablet client */
+		} else if (window.matchMedia("(max-width: 1023px)").matches) {
+			client = 'tablet';
+		}
+		console.log(client)
+		/* TODO: Replace 'mobile' with ${client} once new templates developed */
+		screenPanel.attr('src',`/screens/screen${screenState.stage}/mobile.html`)
+	} else {
+		console.error("Invalid stage defined");
 	}
 }
 
