@@ -35,9 +35,9 @@ function postloadPage() {
 		} else if (window.matchMedia("(max-width: 1023px)").matches) {
 			client = 'tablet';
 		}
-		console.log(client)
-		/* TODO: Replace 'mobile' with ${client} once new templates developed */
-		screenPanel.attr('src',`/screens/screen${screenState.stage}/mobile.html`)
+		//screenPanel.attr('src',`/screens/screen${screenState.stage}/${client}.html`)
+		screenPanel.attr('src',`/screens/games/lung.html`)
+		
 	} else {
 		console.error("Invalid stage defined");
 	}

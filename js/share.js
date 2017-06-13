@@ -25,7 +25,7 @@ class GameState {
 		breederCounts -= this.breeders[0].count;
 		for (var i = 0; i < this.upgrades.length; i++) {
 			if (this.upgrades[i].unlocked == 2) {
-				this.upgrades[i].postBuyFunc(state, breederCounts);
+				this.upgrades[i].postBuyFunc(this, breederCounts);
 			}
 		}
 		for (var i = 0; i < this.breeders.length; i++) {
