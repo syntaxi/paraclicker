@@ -1,67 +1,66 @@
 var game = new Phaser.Game($(window).width(), $(window).height(), Phaser.CANVAS, '', { preload: preload, create: create, update: update, render: render});
-var state;
 var swarm;
-var renderTexture;
-var image;
-var bug;
-var scaleMatrix;
 var goal;
+var map;
+var cellSize = 6;
 
 function preload() {
-	state = new GameState();
-	state.load();
-	game.load.image('black', '/images/games/black.gif');
 	game.load.image('bug', '/images/games/bug.gif');
-	scaleMatrix = new Phaser.Matrix((window.innerWidth/16)+1,0,0,(window.innerHeight/16)+1)
 }
 
 function create() {
+	map = game.add.group();
+	map.enableBody = true;
+	map.physicsBodyType = Phaser.Physics.ARCADE;
+	map.x = 50
+	map.y = 100
+	for (var i = 0; i < rawMap.length; i++) {
+		var wall = map.create(rawMap[i].x/cellSize, rawMap[i].y/cellSize);
+		wall.body.setSize(rawMap[i].width/cellSize, rawMap[i].height/cellSize);
+	}
+	
+	map.setAll('body.moves', false);
+	map.setAll('body.immovable', true);
+	
 	var forces = [
-		{ causes: ['boid'],
-		areaOfEffect: 25,
+		{areaOfEffect: 25,
 		strength: 1,
 		calculate: centerOfMass}, 
-		{ causes: ['boid'],
-		areaOfEffect: 25,
-		strength: 15,
-		calculate:matchHeading},
-		{ causes: ['boid'],
-		areaOfEffect: 8,
+		{
+		areaOfEffect: 1,
 		strength: 30,
 		calculate: separation}, 
-		{ causes: [],
-		areaOfEffect: 0,
+		{
 		strength: 0.99,
 		calculate: momentum}, 
-		{ causes: [],
-		areaOfEffect: 0,
-		strength: 1,
+		{
+		strength: 0.5,
 		calculate: goalSeek}, 
-		{ causes: [],
-		areaOfEffect: 0,
+		{
+		strength: 10,
+		calculate: noise}, 
+		{
 		strength: 50,
 		calculate: boundaryAvoidance}
 	];
-	var opts = {
-		type: 'boid',
-		forces: forces,
-		velocity: new Phaser.Point(1, 1),
-	};
-	population = []
-	for (var i = 0; i < 200; i++) {
-		opts.velocity = new Phaser.Point((Math.random()-.5)*1, (Math.random()-.5)*1);
-		population.push(new Agent(Math.random()*window.innerWidth, Math.random()*window.innerHeight, opts, game));
+	swarm = new Swarm(map.x, map.y, map.width, map.height, forces);
+	var bounds = map.getBounds();
+	var out = new Phaser.Point()
+	for (var i = 0; i < 30; i++) {
+		bounds.random(out)
+		swarm.add(out.x + map.x, out.y + map.y, game);
 	}
-	window.swarm = new Swarm(population, 0, 0, window.innerWidth, window.innerHeight);
 	goal = new Phaser.Point(window.innerWidth/2, window.innerHeight/2);
-	game.input.addMoveCallback(setGoal)
+	game.input.addMoveCallback(setGoal);
+	
+	
 }
-
 function update() {
-	swarm.tick()
+	swarm.tick();
+	swarm.forEach(function(agent) {game.physics.arcade.collide(agent, map);}	)
 }
 function render() {
-	swarm.forEach(function(agent) {game.debug.body(agent)}	)
+	map.forEach(function(wall) {game.debug.body(wall)}	)
 }
 
 function setGoal(pointer, x, y) {
@@ -69,6 +68,9 @@ function setGoal(pointer, x, y) {
 		goal.x = x;
 		goal.y = y;
 	}
+}
+function noise(agent) {
+	return new Phaser.Point(Math.random()*2-1,Math.random()*2-1)
 }
 
 function goalSeek(agent) {
@@ -116,18 +118,17 @@ function momentum(agent){
   return agent.body.velocity;
 }
 
-function boundaryAvoidance(agent){
-  var bounds =  [20, 20, window.innerHeight-40, window.innerWidth-40];
+function boundaryAvoidance(agent) {
   var result = new Phaser.Point();
-  if (agent.position.y < bounds[0]) {
-    result.y = bounds[0]-agent.position.y;
-  } else if (agent.position.y > bounds[2]) {
-    result.y = bounds[2]-agent.position.y;
+  if (agent.position.y < map.y) {
+    result.y = map.y-agent.position.y;
+  } else if (agent.position.y > map.bottom) {
+    result.y = map.bottom-agent.position.y;
   }
-  if (agent.position.x < bounds[1]) {
-    result.x = bounds[1]-agent.position.x;
-  } else if (agent.position.x > bounds[3]) {
-    result.x = bounds[3]-agent.position.x;
+  if (agent.position.x < map.x) {
+    result.x = map.x-agent.position.x;
+  } else if (agent.position.x > map.right) {
+    result.x = map.right-agent.position.x;
   }
   return result;
 }

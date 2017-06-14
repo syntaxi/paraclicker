@@ -142,45 +142,44 @@ class Quadtree {
 }
 
 class Swarm {
-	constructor(population, originX, originY, width, height){
-		this.population = population || [];
+	constructor(originX, originY, width, height, forces){
+		this.population = [];
+		this.forces = forces
 		this.quadtree = new Quadtree(new Phaser.Rectangle(originX, originY, width, height));
 	}
-
+	
+	add (x, y, game) {
+		this.population.push(new Agent(x, y, game))
+	}
+	
 	tick() { 
 		var i, point, agent;
-		for ( i = 0; i < this.population.length; i++ ){
-			agent = this.population[i];
-			this.quadtree.insert(agent);
+		for (i = 0; i < this.population.length; i++) {
+			this.quadtree.insert(this.population[i]);
 		}
-		for ( i = 0; i < this.population.length; i++ ){
-			this.population[i].calculateNextAcceleration(this.quadtree);
-		}
-		for( i = 0; i < this.population.length; i++ ){
-			//this.population[i].update();
+		for (i = 0; i < this.population.length; i++) {
+			this.population[i].calculateNextAcceleration(this.quadtree, this.forces);
 		}
 		this.quadtree.clear();
-	};
+	}
 
 	forEach(callback) {
-		for (var i = 0; i < this.population.length; i++){
+		for (var i = 0; i < this.population.length; i++) {
 			callback(this.population[i]);
 		}
 	}
 }
 
 class Agent extends Phaser.Sprite {
-	constructor(x,y,opts, game) {
+	constructor(x, y, game) {
 		super(game, x, y, 'bug')
 		game.add.existing(this)
 		game.physics.arcade.enable(this)
-		console.log(this.body.velocity)
-		this.type = opts.type || 'default';
-		this.forces = opts.forces || {};
-		this.body.velocity = opts.velocity || new Phaser.Point()
-		this.acceleration = opts.acceleration || new Phaser.Point()
-		this.velocityLimit = opts.velocityLimit || 2;
-		this.accelerationLimit = opts.accelerationLimit || 0.3;
+		
+		this.body.velocity = new Phaser.Point()
+		this.acceleration = new Phaser.Point()
+		this.velocityLimit = 2;
+		this.accelerationLimit = 0.3;
 		this.nextAcceleration = new Phaser.Point()
 	}
 	update() {
@@ -208,30 +207,22 @@ class Agent extends Phaser.Sprite {
 		}
 	}
 
-	calculateNextAcceleration(quadtree){ 
+	calculateNextAcceleration(quadtree, forces){ 
 		var resultantVector = new Phaser.Point()
 		var that = this;
 		var neighbors;
-		for ( var i = 0; i < this.forces.length; i++ ){
-			if(this.forces[i].areaOfEffect) {
-
+		for ( var i = 0; i < forces.length; i++ ){
+			if(forces[i].areaOfEffect) {
 				var aoeRange = new Phaser.Rectangle(
-					this.position.x - this.forces[i].areaOfEffect,
-					this.position.y - this.forces[i].areaOfEffect,
-					this.forces[i].areaOfEffect * 2,
-					this.forces[i].areaOfEffect * 2
+					this.position.x - forces[i].areaOfEffect,
+					this.position.y - forces[i].areaOfEffect,
+					forces[i].areaOfEffect * 2,
+					forces[i].areaOfEffect * 2
 				)
-				var raw = quadtree.queryRange(aoeRange);
-
-				neighbors = [];
-				for (var j = 0; j < raw.length; j++ ){
-					if(this.forces[i].causes.indexOf(raw[j].type) !== -1){
-						neighbors.push(raw[j]);
-					}
-				}
+				neighbors = quadtree.queryRange(aoeRange);
 			}
-			var rawVector = this.forces[i].calculate(that, neighbors)
-			rawVector.multiply(this.forces[i].strength, this.forces[i].strength)
+			var rawVector = forces[i].calculate(that, neighbors)
+			rawVector.multiply(forces[i].strength, forces[i].strength)
 			Phaser.Point.add(resultantVector, rawVector, resultantVector);
 		}
 		Phaser.Point.add(this.nextAcceleration, resultantVector, this.nextAcceleration);
